@@ -1,0 +1,4433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Talent Academy - Plataforma de Cursos</title>
+    <meta name="description" content="Plataforma educativa de Next Talent Academy con cursos especializados y herramientas de aprendizaje">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --admin-color: #8b5cf6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-secondary: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --gradient-admin: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            --error-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+        }
+
+        [data-theme="dark"] {
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --bg-card: #374151;
+            --border-color: #4b5563;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .user-badge {
+            background: var(--admin-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .user-badge.student {
+            background: var(--primary-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-container input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .admin-panel {
+            background: var(--gradient-admin);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .admin-panel h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .admin-action {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .admin-action:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .admin-action i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-section {
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            color: white;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .instruction-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .instruction-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .instruction-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            margin: 0 auto 1rem;
+        }
+
+        .instruction-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .course-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .course-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .course-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .course-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .course-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .course-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .course-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .course-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .course-progress {
+            margin-top: 1rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .zoom-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .zoom-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .zoom-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .zoom-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .zoom-link:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .zoom-link i {
+            font-size: 1.5rem;
+        }
+
+        .zoom-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .access-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .access-modal.active {
+            display: flex;
+        }
+
+        .access-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .access-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: var(--gradient-primary);
+            color: white;
+            margin: 0 auto 1.5rem;
+        }
+
+        .access-content h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .access-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .access-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .access-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .access-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .course-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary-color);
+        }
+
+        .course-info h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .course-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .tab-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab-button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tab-button:hover:not(.active) {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .materials-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .material-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .material-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-color);
+        }
+
+        .material-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            background: var(--bg-secondary);
+            color: var(--primary-color);
+        }
+
+        .material-card h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .material-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .material-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn.secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .test-welcome {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .test-welcome h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .test-welcome p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .name-input {
+            max-width: 400px;
+            margin: 0 auto 2rem;
+        }
+
+        .name-input input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .name-input input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .start-test-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .test-question {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-number {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .timer {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option {
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .option:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-secondary);
+        }
+
+        .option.selected {
+            border-color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .option-marker {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .option.selected .option-marker {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .test-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .test-results {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-score {
+            font-size: 4rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .result-message {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .action-btn.secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-stats .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-align: left;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: var(--gradient-primary);
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .stat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .stat-info h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .progress-chart {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: 300px;
+            position: relative;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 350px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--info-color);
+        }
+
+        .toast.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+
+        .toast.success .toast-icon {
+            color: var(--success-color);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--error-color);
+        }
+
+        .toast.info .toast-icon {
+            color: var(--info-color);
+        }
+
+        .toast.warning .toast-icon {
+            color: var(--warning-color);
+        }
+
+        .external-links {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .external-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .external-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 5rem;
+            right: 2rem;
+            width: 350px;
+            height: 500px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .chatbot-container.active {
+            display: flex;
+            animation: slideInUp 0.3s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chatbot-header {
+            padding: 1rem;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chatbot-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .chatbot-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .message.bot {
+            background: var(--bg-secondary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            background: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chatbot-options {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chatbot-option {
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .chatbot-option:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .test-editor {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .test-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .test-editor-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .test-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .questions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .question-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .question-header h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .option-row input {
+            flex: 1;
+        }
+
+        .correct-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .test-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .tests-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .test-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .test-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-color);
+        }
+
+        .test-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .test-card h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .test-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .test-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .test-actions-small {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .module-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-color);
+        }
+
+        .module-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            margin: 0 auto 1rem;
+        }
+
+        .module-card h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .module-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .zoom-management-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .zoom-course-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .zoom-course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .zoom-course-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-error {
+            border-color: var(--error-color) !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .search-container input {
+                width: 250px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .welcome-section {
+                padding: 2rem 1.5rem;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 1rem;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .course-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .course-tabs {
+                flex-wrap: wrap;
+            }
+
+            .materials-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .filter-buttons {
+                flex-wrap: wrap;
+            }
+
+            .test-navigation {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .progress-container {
+                order: -1;
+                width: 100%;
+            }
+
+            .result-actions {
+                flex-direction: column;
+            }
+
+            .chatbot-container {
+                width: 90%;
+                right: 5%;
+                height: 70vh;
+            }
+
+            .external-links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .admin-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .progress-stats .stat-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem 1rem;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .stat-info h3 {
+                font-size: 0.9rem;
+                white-space: normal;
+            }
+
+            .progress-chart {
+                height: 250px;
+                padding: 1rem;
+            }
+
+            .progress-bar {
+                height: 8px;
+            }
+
+            .progress-fill {
+                height: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+
+            .progress-stats .stat-card {
+                padding: 1rem;
+            }
+
+            .progress-chart {
+                height: 200px;
+                padding: 0.75rem;
+            }
+
+            .stat-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+
+            .stat-info h3 {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 768px) and (orientation: portrait) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .progress-stats .stat-card {
+                border-radius: 12px;
+            }
+
+            .progress-chart {
+                border-radius: 12px;
+            }
+        }
+
+        @media (max-width: 768px) and (orientation: landscape) {
+            .progress-chart {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>Cargando plataforma</h2>
+            <p>Preparando tu experiencia de aprendizaje...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="mainHeader">
+        <nav class="navbar">
+            <a href="#" class="nav-brand" onclick="app.showView('dashboard'); return false;">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Next Talent Academy</span>
+            </a>
+            <div class="nav-actions">
+                <div class="user-info" id="userInfo">
+                    <span id="userName">Usuario</span>
+                    <span class="user-badge student" id="userType" tabindex="0" role="button" aria-label="Cambiar tipo de usuario">Estudiante</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="search-container">
+                    <input type="text" id="globalSearch" placeholder="Buscar cursos, materiales..." aria-label="Buscar en la plataforma">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Dashboard View -->
+        <section id="dashboardView" class="view active">
+            <div class="dashboard-header">
+                <h1 id="dashboardTitle">Tu Futuro Comienza Aquí</h1>
+                <p id="dashboardSubtitle">Desarrolla habilidades profesionales con nuestros cursos especializados y transforma tu carrera</p>
+            </div>
+
+            <!-- Admin Panel -->
+            <div class="admin-panel" id="adminPanel" style="display: none;">
+                <h2><i class="fas fa-cogs"></i> Panel de Administración</h2>
+                <div class="admin-actions">
+                    <div class="admin-action" onclick="app.showZoomManagement()" role="button" tabindex="0">
+                        <i class="fas fa-video"></i>
+                        <h3>Gestionar Zoom</h3>
+                        <p>Configurar enlaces de conferencias</p>
+                    </div>
+                    <div class="admin-action" onclick="app.showTestManagement()" role="button" tabindex="0">
+                        <i class="fas fa-edit"></i>
+                        <h3>Gestionar Tests</h3>
+                        <p>Crear y editar evaluaciones</p>
+                    </div>
+                    <div class="admin-action" onclick="app.showUserManagement()" role="button" tabindex="0">
+                        <i class="fas fa-users"></i>
+                        <h3>Gestionar Usuarios</h3>
+                        <p>Administrar estudiantes y permisos</p>
+                    </div>
+                    <div class="admin-action" onclick="app.showAnalytics()" role="button" tabindex="0">
+                        <i class="fas fa-chart-bar"></i>
+                        <h3>Analíticas</h3>
+                        <p>Ver estadísticas de uso</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <div class="welcome-content">
+                    <h2 class="welcome-title" id="welcomeTitle">Bienvenido a tu Academia Digital</h2>
+                    <p class="welcome-subtitle" id="welcomeSubtitle">Accede a cursos especializados, materiales exclusivos y certificaciones reconocidas para impulsar tu desarrollo profesional.</p>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-number">6+</div>
+                    <div class="stat-label">Cursos Disponibles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">85%</div>
+                    <div class="stat-label">Tasa de Finalización</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">Satisfacción Estudiantil</div>
+                </div>
+            </div>
+
+            <!-- External Links -->
+            <div class="external-links">
+                <a href="https://educacionnext.github.io/NextTalentAcademy/" class="external-link" target="_blank" rel="noopener noreferrer">
+                    <i class="fas fa-globe"></i>
+                    Visitar Página Oficial
+                </a>
+                <a href="https://chat.whatsapp.com/H00gBsxuBs1E2S3qly3c35" class="external-link" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-whatsapp"></i>
+                    Unirse al Grupo Oficial
+                </a>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions-grid">
+                <div class="instruction-card">
+                    <div class="instruction-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Acceso Seguro</h3>
+                    <p>Cada curso requiere un código único proporcionado por la academia para acceder a los materiales</p>
+                </div>
+                <div class="instruction-card">
+                    <div class="instruction-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>Materiales de Estudio</h3>
+                    <p>Encuentra todos los recursos organizados por tipo: PDFs, videos y presentaciones</p>
+                </div>
+                <div class="instruction-card">
+                    <div class="instruction-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3>Evaluaciones</h3>
+                    <p>Completa tests interactivos para medir tu comprensión y obtener certificados</p>
+                </div>
+                <div class="instruction-card">
+                    <div class="instruction-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Seguimiento de Progreso</h3>
+                    <p>Monitorea tu avance con estadísticas detalladas y gráficos interactivos</p>
+                </div>
+            </div>
+            
+            <div class="courses-grid" id="coursesGrid">
+                <!-- Los cursos se cargan dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Course Detail View -->
+        <section id="courseDetailView" class="view">
+            <div class="course-header">
+                <button class="back-button" id="backButton">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al Dashboard
+                </button>
+                <div class="course-info">
+                    <h1 id="courseTitle">Nombre del Curso</h1>
+                    <div class="course-stats">
+                        <span class="stat">
+                            <i class="fas fa-file"></i>
+                            <span id="fileCount">0</span> archivos
+                        </span>
+                        <span class="stat">
+                            <i class="fas fa-clock"></i>
+                            <span id="courseDuration">0h</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zoom Section -->
+            <div class="zoom-section" id="zoomSection" style="display: none;">
+                <div class="zoom-header">
+                    <h3><i class="fas fa-video"></i> Conferencias en Zoom</h3>
+                    <button class="action-btn primary" id="addZoomLink" style="display: none;">
+                        <i class="fas fa-plus"></i>
+                        Agregar Enlace
+                    </button>
+                </div>
+                <div id="zoomLinks">
+                    <!-- Los enlaces de Zoom se cargan dinámicamente -->
+                </div>
+            </div>
+
+            <div class="course-tabs">
+                <button class="tab-button active" data-tab="materials">
+                    <i class="fas fa-folder-open"></i>
+                    Materiales
+                </button>
+                <button class="tab-button" data-tab="test">
+                    <i class="fas fa-question-circle"></i>
+                    Test de Evaluación
+                </button>
+                <button class="tab-button" data-tab="progress">
+                    <i class="fas fa-chart-line"></i>
+                    Progreso
+                </button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Materials Tab -->
+                <div id="materialsTab" class="tab-pane active">
+                    <div class="materials-header">
+                        <h3>Recursos del Curso</h3>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all">Todos</button>
+                            <button class="filter-btn" data-filter="pdf">PDF</button>
+                            <button class="filter-btn" data-filter="video">Videos</button>
+                            <button class="filter-btn" data-filter="presentation">Presentaciones</button>
+                        </div>
+                    </div>
+                    <div class="materials-grid" id="materialsGrid">
+                        <!-- Los materiales se cargan dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Test Tab -->
+                <div id="testTab" class="tab-pane">
+                    <div class="test-container" id="testContainer">
+                        <!-- Contenido del test se carga dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Progress Tab -->
+                <div id="progressTab" class="tab-pane">
+                    <div class="progress-container">
+                        <div class="progress-stats">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Progreso General</h3>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                    <span class="stat-value">0%</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Materiales Revisados</h3>
+                                    <span class="stat-value">0/0</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Mejor Calificación</h3>
+                                    <span class="stat-value">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress-chart">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Views -->
+        <section id="zoomManagementView" class="view">
+            <div class="course-header">
+                <button class="back-button" onclick="app.showView('dashboard')">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al Dashboard
+                </button>
+                <div class="course-info">
+                    <h1>Gestión de Enlaces Zoom</h1>
+                    <p>Administra los enlaces de conferencias para cada curso</p>
+                </div>
+            </div>
+
+            <div class="zoom-management-container" id="zoomManagementContainer">
+                <!-- Gestión de enlaces Zoom por curso -->
+            </div>
+        </section>
+
+        <section id="testManagementView" class="view">
+            <div class="course-header">
+                <button class="back-button" onclick="app.showView('dashboard')">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al Dashboard
+                </button>
+                <div class="course-info">
+                    <h1>Gestión de Tests</h1>
+                    <p>Edita las preguntas y respuestas de los tests por curso</p>
+                </div>
+            </div>
+
+            <div class="materials-grid" id="testManagementGrid">
+                <!-- Gestión de tests por curso -->
+            </div>
+        </section>
+
+        <!-- Test Editor View -->
+        <section id="testEditorView" class="view">
+            <div class="course-header">
+                <button class="back-button" onclick="app.showView('testManagement')">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver a Gestión de Tests
+                </button>
+                <div class="course-info">
+                    <h1 id="testEditorTitle">Editor de Test</h1>
+                    <p id="testEditorSubtitle">Configura las preguntas y respuestas del test</p>
+                </div>
+            </div>
+
+            <div class="test-editor">
+                <div class="test-editor-header">
+                    <h3><i class="fas fa-edit"></i> Editor de Preguntas</h3>
+                    <button class="action-btn primary" onclick="app.saveTest()">
+                        <i class="fas fa-save"></i>
+                        Guardar Test
+                    </button>
+                </div>
+
+                <div class="test-form">
+                    <div class="form-group">
+                        <label for="testTitle">Título del Test</label>
+                        <input type="text" id="testTitle" placeholder="Ej: Evaluación Final - Inspector de Calidad">
+                        <div class="error-message" id="testTitleError" style="display: none;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>El título del test es obligatorio</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="testDescription">Descripción</label>
+                        <textarea id="testDescription" rows="3" placeholder="Describe el propósito y contenido del test"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="testDuration">Duración (minutos)</label>
+                        <input type="number" id="testDuration" value="30" min="5" max="180">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passingScore">Puntuación para Aprobar (%)</label>
+                        <input type="number" id="passingScore" value="70" min="50" max="100">
+                    </div>
+
+                    <div class="questions-container" id="questionsContainer">
+                        <!-- Las preguntas se agregarán aquí dinámicamente -->
+                    </div>
+
+                    <div class="test-actions">
+                        <button class="action-btn secondary" onclick="app.addQuestion()">
+                            <i class="fas fa-plus"></i>
+                            Agregar Pregunta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Access Modal -->
+    <div id="accessModal" class="access-modal">
+        <div class="access-content">
+            <div class="access-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2>Acceso Restringido</h2>
+            <p id="accessMessage">Ingresa el código de acceso proporcionado por la academia para desbloquear este curso</p>
+            <input type="text" id="accessCode" class="access-input" placeholder="Código de acceso">
+            <div class="error-message" id="accessCodeError" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Código incorrecto. Verifica e intenta nuevamente.</span>
+            </div>
+            <div class="access-actions">
+                <button class="action-btn secondary" id="cancelAccess">Cancelar</button>
+                <button class="action-btn primary" id="submitAccess">Verificar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Access Modal -->
+    <div id="adminAccessModal" class="access-modal">
+        <div class="access-content">
+            <div class="access-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h2>Acceso de Administrador</h2>
+            <p>Ingresa el PIN de administrador para acceder a esta función</p>
+            <input type="password" id="adminPin" class="access-input" placeholder="PIN de administrador" maxlength="6">
+            <div class="error-message" id="adminPinError" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>PIN incorrecto. Intenta nuevamente.</span>
+            </div>
+            <div class="access-actions">
+                <button class="action-btn secondary" id="cancelAdminAccess">Cancelar</button>
+                <button class="action-btn primary" id="submitAdminAccess">Verificar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Chatbot -->
+    <div class="chatbot-toggle" id="chatbotToggle" role="button" tabindex="0" aria-label="Abrir asistente virtual">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <i class="fas fa-robot"></i>
+            <h3>EVA - Asistente Virtual</h3>
+            <button class="chatbot-close" id="chatbotClose" aria-label="Cerrar asistente virtual">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <!-- Los mensajes se cargan dinámicamente -->
+        </div>
+        <div class="chatbot-options" id="chatbotOptions">
+            <!-- Las opciones se cargan dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        // Aplicación principal - CORREGIDA Y MEJORADA
+        class LearningApp {
+            constructor() {
+                this.currentView = 'dashboard';
+                this.currentCourse = null;
+                this.courses = [];
+                this.theme = localStorage.getItem('theme') || 'light';
+                this.favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+                this.accessCodes = {
+                    'curso-1': 'NTA2024QC',
+                    'curso-2': 'NTA2024SI',
+                    'curso-3': 'NTA2024GP',
+                    'curso-4': 'NTA2024MA',
+                    'curso-5': 'NTA2024MD',
+                    'curso-6': 'NTA2024PW'
+                };
+                this.unlockedCourses = JSON.parse(localStorage.getItem('unlockedCourses')) || [];
+                this.userType = localStorage.getItem('userType') || 'student';
+                this.userName = localStorage.getItem('userName') || 'Usuario';
+                this.zoomLinks = JSON.parse(localStorage.getItem('zoomLinks')) || {};
+                this.tests = JSON.parse(localStorage.getItem('courseTests')) || {};
+                this.questionCounter = 0;
+                this.adminPin = '202000';
+                this.editingCourseId = null;
+                this.userResults = JSON.parse(localStorage.getItem('userResults')) || {};
+                this.isInitialized = false;
+                
+                this.init();
+            }
+
+            async init() {
+                try {
+                    setTimeout(() => {
+                        this.showLoadingScreen(false);
+                    }, 1000);
+                    
+                    this.setupUserInterface();
+                    this.setupEventListeners();
+                    await this.loadCourses();
+                    this.loadExistingTests();
+                    
+                    this.isInitialized = true;
+                    console.log("Aplicación inicializada correctamente");
+                } catch (error) {
+                    console.error("Error al inicializar la aplicación:", error);
+                    this.showToast("Error al cargar la aplicación. Recarga la página.", "error");
+                }
+            }
+
+            setupEventListeners() {
+                document.getElementById('themeToggle').addEventListener('click', () => {
+                    this.toggleTheme();
+                });
+
+                document.getElementById('userType').addEventListener('click', () => {
+                    this.requestAdminAccess();
+                });
+
+                document.getElementById('userType').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.requestAdminAccess();
+                    }
+                });
+
+                document.getElementById('globalSearch').addEventListener('input', (e) => {
+                    this.handleSearch(e.target.value);
+                });
+
+                document.getElementById('backButton').addEventListener('click', () => {
+                    this.showView('dashboard');
+                });
+
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        this.switchTab(e.target.dataset.tab);
+                    });
+                });
+
+                document.querySelectorAll('.filter-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        this.filterMaterials(e.target.dataset.filter);
+                    });
+                });
+
+                document.getElementById('cancelAccess').addEventListener('click', () => {
+                    this.hideAccessModal();
+                });
+
+                document.getElementById('submitAccess').addEventListener('click', () => {
+                    this.verifyAccessCode();
+                });
+
+                document.getElementById('accessCode').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.verifyAccessCode();
+                    }
+                });
+
+                document.getElementById('cancelAdminAccess').addEventListener('click', () => {
+                    this.hideAdminAccessModal();
+                });
+
+                document.getElementById('submitAdminAccess').addEventListener('click', () => {
+                    this.verifyAdminAccess();
+                });
+
+                document.getElementById('adminPin').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.verifyAdminAccess();
+                    }
+                });
+
+                document.getElementById('chatbotToggle').addEventListener('click', () => {
+                    this.toggleChatbot();
+                });
+
+                document.getElementById('chatbotToggle').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.toggleChatbot();
+                    }
+                });
+
+                document.getElementById('chatbotClose').addEventListener('click', () => {
+                    this.hideChatbot();
+                });
+
+                const addZoomButton = document.getElementById('addZoomLink');
+                if (addZoomButton) {
+                    addZoomButton.addEventListener('click', () => {
+                        this.addZoomLink();
+                    });
+                }
+
+                window.addEventListener('error', (e) => {
+                    console.error('Error no capturado:', e.error);
+                    this.showToast('Ha ocurrido un error inesperado', 'error');
+                });
+
+                window.addEventListener('unhandledrejection', (e) => {
+                    console.error('Promesa rechazada no capturada:', e.reason);
+                    this.showToast('Error en una operación asíncrona', 'error');
+                    e.preventDefault();
+                });
+            }
+
+            requestAdminAccess() {
+                if (this.userType === 'student') {
+                    this.showAdminAccessModal();
+                } else {
+                    this.toggleUserType();
+                }
+            }
+
+            showAdminAccessModal() {
+                const modal = document.getElementById('adminAccessModal');
+                document.getElementById('adminPin').value = '';
+                this.hideError('adminPinError');
+                modal.classList.add('active');
+                
+                setTimeout(() => {
+                    document.getElementById('adminPin').focus();
+                }, 100);
+            }
+
+            hideAdminAccessModal() {
+                document.getElementById('adminAccessModal').classList.remove('active');
+            }
+
+            verifyAdminAccess() {
+                const pin = document.getElementById('adminPin').value;
+                
+                if (!pin) {
+                    this.showError('adminPinError', 'El PIN es obligatorio');
+                    return;
+                }
+                
+                if (pin === this.adminPin) {
+                    this.userType = 'admin';
+                    localStorage.setItem('userType', this.userType);
+                    this.updateUserInfo();
+                    this.hideAdminAccessModal();
+                    this.showToast('Acceso de administrador concedido', 'success');
+                } else {
+                    this.showError('adminPinError', 'PIN incorrecto. Intenta nuevamente.');
+                }
+            }
+
+            toggleUserType() {
+                if (this.userType === 'student') {
+                    this.requestAdminAccess();
+                } else {
+                    this.userType = 'student';
+                    this.showToast('Modo estudiante activado', 'success');
+                }
+                localStorage.setItem('userType', this.userType);
+                this.updateUserInfo();
+            }
+
+            setupUserInterface() {
+                this.setTheme(this.theme);
+                this.updateUserInfo();
+                this.showView('dashboard');
+            }
+
+            updateUserInfo() {
+                const userInfo = document.getElementById('userInfo');
+                const userName = document.getElementById('userName');
+                const userType = document.getElementById('userType');
+                
+                if (userName) userName.textContent = this.userName;
+                
+                if (this.userType === 'admin') {
+                    if (userType) {
+                        userType.textContent = 'Administrador';
+                        userType.className = 'user-badge';
+                        userType.setAttribute('aria-label', 'Cambiar a modo estudiante');
+                    }
+                    const adminPanel = document.getElementById('adminPanel');
+                    if (adminPanel) adminPanel.style.display = 'block';
+                    
+                    const dashboardTitle = document.getElementById('dashboardTitle');
+                    const dashboardSubtitle = document.getElementById('dashboardSubtitle');
+                    const welcomeTitle = document.getElementById('welcomeTitle');
+                    const welcomeSubtitle = document.getElementById('welcomeSubtitle');
+                    
+                    if (dashboardTitle) dashboardTitle.textContent = 'Panel de Administración';
+                    if (dashboardSubtitle) dashboardSubtitle.textContent = 'Gestiona cursos, materiales y evaluaciones para los estudiantes';
+                    if (welcomeTitle) welcomeTitle.textContent = 'Bienvenido, Administrador';
+                    if (welcomeSubtitle) welcomeSubtitle.textContent = 'Desde aquí puedes gestionar todos los aspectos de la plataforma educativa';
+                } else {
+                    if (userType) {
+                        userType.textContent = 'Estudiante';
+                        userType.className = 'user-badge student';
+                        userType.setAttribute('aria-label', 'Solicitar acceso de administrador');
+                    }
+                    const adminPanel = document.getElementById('adminPanel');
+                    if (adminPanel) adminPanel.style.display = 'none';
+                }
+            }
+
+            async loadCourses() {
+                try {
+                    this.courses = await this.fetchCoursesData();
+                    this.renderCourses();
+                } catch (error) {
+                    console.error('Error loading courses:', error);
+                    this.showToast('Error al cargar los cursos', 'error');
+                    this.showEmptyState('coursesGrid', 'No se pudieron cargar los cursos', 'Intenta recargar la página');
+                }
+            }
+
+            async fetchCoursesData() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve([
+                            {
+                                id: 'curso-1',
+                                title: 'Inspector de Calidad',
+                                description: 'Aprende los fundamentos de la inspección de calidad y control de procesos.',
+                                icon: 'fas fa-clipboard-check',
+                                color: '#6366f1',
+                                materials: [
+                                    {
+                                        id: 'mat-1',
+                                        name: 'Manual de Procedimientos',
+                                        type: 'pdf',
+                                        size: '2.4 MB',
+                                        duration: '45 min',
+                                        path: 'https://drive.google.com/drive/folders/1IqoVv0mTPrgpsKoWswl9vyG8wRz4xXDP?usp=sharing'
+                                    },
+                                    {
+                                        id: 'mat-2',
+                                        name: 'Presentación Introducción',
+                                        type: 'presentation',
+                                        size: '1.8 MB',
+                                        duration: '30 min',
+                                        path: 'https://drive.google.com/drive/folders/1IqoVv0mTPrgpsKoWswl9vyG8wRz4xXDP?usp=sharing'
+                                    },
+                                    {
+                                        id: 'mat-3',
+                                        name: 'Video: Técnicas de Inspección',
+                                        type: 'video',
+                                        size: '15.2 MB',
+                                        duration: '12 min',
+                                        path: 'https://drive.google.com/drive/folders/1IqoVv0mTPrgpsKoWswl9vyG8wRz4xXDP?usp=sharing'
+                                    },
+                                    {
+                                        id: 'mat-4',
+                                        name: 'Checklist de Calidad',
+                                        type: 'pdf',
+                                        size: '0.8 MB',
+                                        duration: '20 min',
+                                        path: 'https://drive.google.com/drive/folders/1IqoVv0mTPrgpsKoWswl9vyG8wRz4xXDP?usp=sharing'
+                                    }
+                                ],
+                                stats: {
+                                    files: 4,
+                                    duration: '2h',
+                                    progress: 0
+                                }
+                            },
+                            {
+                                id: 'curso-2',
+                                title: 'Seguridad Industrial',
+                                description: 'Protocolos y mejores prácticas para garantizar la seguridad en entornos industriales.',
+                                icon: 'fas fa-hard-hat',
+                                color: '#f59e0b',
+                                materials: [
+                                    {
+                                        id: 'mat-5',
+                                        name: 'Manual de Seguridad OSHA',
+                                        type: 'pdf',
+                                        size: '4.5 MB',
+                                        duration: '50 min',
+                                        path: 'https://drive.google.com/drive/folders/1IqoVv0mTPrgpsKoWswl9vyG8wRz4xXDP?usp=sharing'
+                                    },
+                                    {
+                                        id: 'mat-6',
+                                        name: 'Procedimientos de Emergencia',
+                                        type: 'pdf',
+                                        size: '1.8 MB',
+                                        duration: '30 min',
+                                        path: 'https://drive.google.com/drive/folders/1IqoVv0mTPrgpsKoWswl9vyG8wRz4xXDP?usp=sharing'
+                                    }
+                                ],
+                                stats: {
+                                    files: 2,
+                                    duration: '1.3h',
+                                    progress: 65
+                                }
+                            },
+                            {
+                                id: 'curso-3',
+                                title: 'Planificacion de la produccion',
+                                description: 'Domina las metodologías ágiles y tradicionales de la Planificacion de la produccion.',
+                                icon: 'fas fa-project-diagram',
+                                color: '#10b981',
+                                materials: [
+                                    {
+                                        id: 'mat-7',
+                                        name: 'Guía PMBOK',
+                                        type: 'pdf',
+                                        size: '3.2 MB',
+                                        duration: '60 min',
+                                        path: 'https://drive.google.com/drive/folders/1Pl8M1-LW5nmQm8vDvxdzXFK3eqy7Us19?usp=sharing'
+                                    },
+                                    {
+                                        id: 'mat-8',
+                                        name: 'Video: Metodologías Ágiles',
+                                        type: 'video',
+                                        size: '22.1 MB',
+                                        duration: '18 min',
+                                        path: 'https://drive.google.com/drive/folders/1Pl8M1-LW5nmQm8vDvxdzXFK3eqy7Us19?usp=sharing'
+                                    }
+                                ],
+                                stats: {
+                                    files: 2,
+                                    duration: '1.5h',
+                                    progress: 20
+                                }
+                            },
+                            {
+                                id: 'curso-4',
+                                title: 'Mantenimiento Autónomo',
+                                description: 'Implementa estrategias de mantenimiento autónomo para aumentar la disponibilidad de equipos.',
+                                icon: 'fas fa-tools',
+                                color: '#059669',
+                                materials: [
+                                    {
+                                        id: 'mat-9',
+                                        name: 'Guía de Funciones Avanzadas',
+                                        type: 'pdf',
+                                        size: '2.1 MB',
+                                        duration: '40 min',
+                                        path: 'https://drive.google.com/drive/folders/1Pl8M1-LW5nmQm8vDvxdzXFK3eqy7Us19?usp=sharing'
+                                    }
+                                ],
+                                stats: {
+                                    files: 1,
+                                    duration: '40min',
+                                    progress: 10
+                                }
+                            },
+                            {
+                                id: 'curso-5',
+                                title: 'Marketing Digital',
+                                description: 'Estrategias modernas de marketing digital para impulsar tu negocio.',
+                                icon: 'fas fa-bullhorn',
+                                color: '#ec4899',
+                                materials: [
+                                    {
+                                        id: 'mat-10',
+                                        name: 'Guía de Redes Sociales',
+                                        type: 'pdf',
+                                        size: '2.8 MB',
+                                        duration: '35 min',
+                                        path: 'https://drive.google.com/drive/folders/1Pl8M1-LW5nmQm8vDvxdzXFK3eqy7Us19?usp=sharing'
+                                    }
+                                ],
+                                stats: {
+                                    files: 1,
+                                    duration: '35min',
+                                    progress: 5
+                                }
+                            },
+                            {
+                                id: 'curso-6',
+                                title: 'Programación Web',
+                                description: 'Aprende los fundamentos de HTML, CSS y JavaScript para crear sitios web.',
+                                icon: 'fas fa-code',
+                                color: '#3b82f6',
+                                materials: [
+                                    {
+                                        id: 'mat-11',
+                                        name: 'Introducción a HTML y CSS',
+                                        type: 'pdf',
+                                        size: '3.5 MB',
+                                        duration: '55 min',
+                                        path: 'https://drive.google.com/drive/folders/1example'
+                                    }
+                                ],
+                                stats: {
+                                    files: 1,
+                                    duration: '55min',
+                                    progress: 15
+                                }
+                            }
+                        ]);
+                    }, 500);
+                });
+            }
+
+            renderCourses() {
+                const grid = document.getElementById('coursesGrid');
+                
+                if (!this.courses || this.courses.length === 0) {
+                    this.showEmptyState('coursesGrid', 'No hay cursos disponibles', 'Contacta al administrador para más información');
+                    return;
+                }
+
+                grid.innerHTML = '';
+
+                this.courses.forEach(course => {
+                    const card = this.createCourseCard(course);
+                    grid.appendChild(card);
+                });
+            }
+
+            createCourseCard(course) {
+                const card = document.createElement('div');
+                card.className = 'course-card';
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', `Abrir curso: ${course.title}`);
+                
+                const isUnlocked = this.unlockedCourses.includes(course.id) || this.userType === 'admin';
+                const lockIcon = isUnlocked ? 'fas fa-lock-open' : 'fas fa-lock';
+                const lockText = isUnlocked ? 'Acceso concedido' : 'Acceso restringido';
+                
+                card.innerHTML = `
+                    <div class="course-card-header">
+                        <div class="course-icon" style="background: ${course.color}">
+                            <i class="${course.icon}"></i>
+                        </div>
+                        <div class="course-badge">
+                            <i class="${lockIcon}"></i>
+                            ${lockText}
+                        </div>
+                    </div>
+                    <h3>${course.title}</h3>
+                    <p>${course.description}</p>
+                    <div class="course-stats">
+                        <div class="course-stat">
+                            <i class="fas fa-file"></i>
+                            <span>${course.stats.files} archivos</span>
+                        </div>
+                        <div class="course-stat">
+                            <i class="fas fa-clock"></i>
+                            <span>${course.stats.duration}</span>
+                        </div>
+                    </div>
+                    <div class="course-progress">
+                        <div class="progress-label">
+                            <span>Progreso</span>
+                            <span>${course.stats.progress}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${course.stats.progress}%"></div>
+                        </div>
+                    </div>
+                `;
+
+                const openCourse = () => {
+                    if (isUnlocked) {
+                        this.openCourse(course);
+                    } else {
+                        this.showAccessModal(course);
+                    }
+                };
+
+                card.addEventListener('click', openCourse);
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openCourse();
+                    }
+                });
+
+                return card;
+            }
+
+            showAccessModal(course) {
+                this.currentCourse = course;
+                const modal = document.getElementById('accessModal');
+                const message = document.getElementById('accessMessage');
+                
+                message.textContent = `Ingresa el código de acceso para el curso "${course.title}"`;
+                document.getElementById('accessCode').value = '';
+                this.hideError('accessCodeError');
+                
+                modal.classList.add('active');
+                
+                setTimeout(() => {
+                    document.getElementById('accessCode').focus();
+                }, 100);
+            }
+
+            hideAccessModal() {
+                document.getElementById('accessModal').classList.remove('active');
+                this.currentCourse = null;
+            }
+
+            verifyAccessCode() {
+                const code = document.getElementById('accessCode').value.trim().toUpperCase();
+                const courseId = this.currentCourse.id;
+                
+                if (!code) {
+                    this.showError('accessCodeError', 'El código de acceso es obligatorio');
+                    return;
+                }
+                
+                if (code === this.accessCodes[courseId]) {
+                    this.unlockedCourses.push(courseId);
+                    localStorage.setItem('unlockedCourses', JSON.stringify(this.unlockedCourses));
+                    
+                    this.showToast('¡Acceso concedido! Bienvenido al curso', 'success');
+                    this.hideAccessModal();
+                    this.openCourse(this.currentCourse);
+                } else {
+                    this.showError('accessCodeError', 'Código incorrecto. Por favor, verifica e intenta nuevamente');
+                }
+            }
+
+            openCourse(course) {
+                this.currentCourse = course;
+                this.renderCourseDetails();
+                this.showView('courseDetail');
+            }
+
+            renderCourseDetails() {
+                if (!this.currentCourse) return;
+
+                document.getElementById('courseTitle').textContent = this.currentCourse.title;
+                document.getElementById('fileCount').textContent = this.currentCourse.stats.files;
+                document.getElementById('courseDuration').textContent = this.currentCourse.stats.duration;
+
+                const zoomSection = document.getElementById('zoomSection');
+                const addZoomButton = document.getElementById('addZoomLink');
+                
+                if (this.userType === 'admin') {
+                    zoomSection.style.display = 'block';
+                    addZoomButton.style.display = 'block';
+                } else {
+                    if (this.zoomLinks[this.currentCourse.id] && this.zoomLinks[this.currentCourse.id].length > 0) {
+                        zoomSection.style.display = 'block';
+                        addZoomButton.style.display = 'none';
+                    } else {
+                        zoomSection.style.display = 'none';
+                    }
+                }
+
+                this.renderZoomLinks();
+                this.renderMaterials();
+
+                if (window.testManager) {
+                    window.testManager.initializeTest(this.currentCourse.id);
+                }
+            }
+
+            renderZoomLinks() {
+                const container = document.getElementById('zoomLinks');
+                container.innerHTML = '';
+
+                const courseZoomLinks = this.zoomLinks[this.currentCourse.id] || [];
+
+                if (courseZoomLinks.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <i class="fas fa-video-slash" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>${this.userType === 'admin' ? 'Aún no hay enlaces de Zoom configurados para este curso' : 'No hay conferencias programadas para este curso'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                courseZoomLinks.forEach((link, index) => {
+                    const linkElement = document.createElement('div');
+                    linkElement.className = 'zoom-link';
+                    linkElement.innerHTML = `
+                        <i class="fab fa-zoom" style="color: #2D8CFF;"></i>
+                        <div style="flex: 1;">
+                            <strong>${link.title || 'Conferencia del Curso'}</strong>
+                            <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                                ${link.description || 'Únete a la conferencia programada'}
+                            </div>
+                        </div>
+                        <div class="zoom-actions">
+                            <a href="${link.url}" target="_blank" class="action-btn primary" rel="noopener noreferrer">
+                                <i class="fas fa-external-link-alt"></i>
+                                Unirse
+                            </a>
+                            ${this.userType === 'admin' ? `
+                                <button class="action-btn secondary" onclick="app.editZoomLink('${this.currentCourse.id}', ${index})" aria-label="Editar enlace">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn secondary" onclick="app.deleteZoomLink('${this.currentCourse.id}', ${index})" aria-label="Eliminar enlace">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+                    container.appendChild(linkElement);
+                });
+            }
+
+            addZoomLink() {
+                const title = prompt('Título de la conferencia:');
+                if (!title) return;
+
+                const description = prompt('Descripción (opcional):');
+                const url = prompt('URL de la conferencia Zoom:');
+                if (!url) return;
+
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    this.showToast('La URL debe comenzar con http:// o https://', 'error');
+                    return;
+                }
+
+                if (!this.zoomLinks[this.currentCourse.id]) {
+                    this.zoomLinks[this.currentCourse.id] = [];
+                }
+
+                this.zoomLinks[this.currentCourse.id].push({
+                    title,
+                    description,
+                    url
+                });
+
+                localStorage.setItem('zoomLinks', JSON.stringify(this.zoomLinks));
+                this.renderZoomLinks();
+                this.showToast('Enlace de Zoom agregado correctamente', 'success');
+            }
+
+            editZoomLink(courseId, index) {
+                const link = this.zoomLinks[courseId][index];
+                const title = prompt('Nuevo título:', link.title);
+                if (title === null) return;
+
+                const description = prompt('Nueva descripción:', link.description || '');
+                const url = prompt('Nueva URL:', link.url);
+                if (url === null) return;
+
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    this.showToast('La URL debe comenzar con http:// o https://', 'error');
+                    return;
+                }
+
+                this.zoomLinks[courseId][index] = {
+                    title: title || link.title,
+                    description: description || link.description,
+                    url: url || link.url
+                };
+
+                localStorage.setItem('zoomLinks', JSON.stringify(this.zoomLinks));
+                this.renderZoomLinks();
+                this.showToast('Enlace de Zoom actualizado', 'success');
+            }
+
+            deleteZoomLink(courseId, index) {
+                if (confirm('¿Estás seguro de que quieres eliminar este enlace de Zoom?')) {
+                    this.zoomLinks[courseId].splice(index, 1);
+                    localStorage.setItem('zoomLinks', JSON.stringify(this.zoomLinks));
+                    this.renderZoomLinks();
+                    this.showToast('Enlace de Zoom eliminado', 'success');
+                }
+            }
+
+            renderMaterials() {
+                const grid = document.getElementById('materialsGrid');
+                grid.innerHTML = '';
+
+                if (!this.currentCourse.materials || this.currentCourse.materials.length === 0) {
+                    this.showEmptyState('materialsGrid', 'No hay materiales disponibles', 'Contacta al administrador para más información');
+                    return;
+                }
+
+                this.currentCourse.materials.forEach(material => {
+                    const card = this.createMaterialCard(material);
+                    grid.appendChild(card);
+                });
+            }
+
+            createMaterialCard(material) {
+                const card = document.createElement('div');
+                card.className = 'material-card';
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                
+                const iconClass = this.getMaterialIcon(material.type);
+                const iconColor = this.getMaterialColor(material.type);
+
+                card.innerHTML = `
+                    <div class="material-icon" style="background: ${iconColor}20; color: ${iconColor}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <h4>${material.name}</h4>
+                    <div class="material-meta">
+                        <span>${material.size}</span>
+                        <span>${material.duration}</span>
+                    </div>
+                    <div class="material-actions">
+                        <button class="action-btn primary" onclick="app.openInDrive('${material.path}')">
+                            <i class="fas fa-external-link-alt"></i>
+                            Ver en Drive
+                        </button>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => {
+                    this.openInDrive(material.path);
+                });
+
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.openInDrive(material.path);
+                    }
+                });
+
+                return card;
+            }
+
+            getMaterialIcon(type) {
+                const icons = {
+                    pdf: 'fas fa-file-pdf',
+                    video: 'fas fa-video',
+                    presentation: 'fas fa-presentation-board',
+                    document: 'fas fa-file-word',
+                    spreadsheet: 'fas fa-file-excel'
+                };
+                return icons[type] || 'fas fa-file';
+            }
+
+            getMaterialColor(type) {
+                const colors = {
+                    pdf: '#ef4444',
+                    video: '#3b82f6',
+                    presentation: '#f59e0b',
+                    document: '#2563eb',
+                    spreadsheet: '#059669'
+                };
+                return colors[type] || '#6b7280';
+            }
+
+            openInDrive(path) {
+                window.open(path, '_blank', 'noopener,noreferrer');
+            }
+
+            switchTab(tabName) {
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.classList.remove('active');
+                    button.setAttribute('aria-selected', 'false');
+                });
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                document.querySelector(`[data-tab="${tabName}"]`).setAttribute('aria-selected', 'true');
+
+                document.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('active');
+                });
+                document.getElementById(`${tabName}Tab`).classList.add('active');
+
+                if (tabName === 'progress') {
+                    this.initializeProgressTab();
+                }
+            }
+
+            filterMaterials(filter) {
+                document.querySelectorAll('.filter-btn').forEach(button => {
+                    button.classList.remove('active');
+                });
+                document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+
+                const materials = document.querySelectorAll('.material-card');
+                materials.forEach(card => {
+                    if (filter === 'all') {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'block';
+                    }
+                });
+            }
+
+            initializeProgressTab() {
+                if (!this.currentCourse) return;
+                
+                const courseId = this.currentCourse.id;
+                const courseResults = this.userResults[courseId];
+                
+                this.updateProgressStats(courseResults);
+                
+                const ctx = document.getElementById('progressChart');
+                if (!ctx) return;
+                
+                if (this.progressChart) {
+                    this.progressChart.destroy();
+                }
+                
+                const chartData = this.getProgressChartData(courseResults);
+                
+                this.progressChart = new Chart(ctx, {
+                    type: 'line',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                title: {
+                                    display: true,
+                                    text: 'Puntuación (%)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Intentos'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            updateProgressStats(courseResults) {
+                const bestScoreElement = document.querySelector('.stat-card:nth-child(3) .stat-value');
+                const materialsReviewedElement = document.querySelector('.stat-card:nth-child(2) .stat-value');
+                const overallProgressElement = document.querySelector('.stat-card:nth-child(1) .stat-value');
+                const progressBar = document.querySelector('.stat-card:nth-child(1) .progress-fill');
+                
+                if (courseResults) {
+                    if (bestScoreElement) {
+                        bestScoreElement.textContent = `${courseResults.bestScore}%`;
+                    }
+                    
+                    const reviewedCount = Math.min(this.currentCourse.materials.length, 2);
+                    if (materialsReviewedElement) {
+                        materialsReviewedElement.textContent = `${reviewedCount}/${this.currentCourse.materials.length}`;
+                    }
+                    
+                    const progressPercentage = Math.min(100, courseResults.bestScore);
+                    if (overallProgressElement) {
+                        overallProgressElement.textContent = `${progressPercentage}%`;
+                    }
+                    if (progressBar) {
+                        progressBar.style.width = `${progressPercentage}%`;
+                    }
+                } else {
+                    if (bestScoreElement) bestScoreElement.textContent = '--';
+                    if (materialsReviewedElement) materialsReviewedElement.textContent = `0/${this.currentCourse.materials.length}`;
+                    if (overallProgressElement) overallProgressElement.textContent = '0%';
+                    if (progressBar) progressBar.style.width = '0%';
+                }
+            }
+
+            getProgressChartData(courseResults) {
+                if (!courseResults || courseResults.attempts.length === 0) {
+                    return {
+                        labels: ['Inicio'],
+                        datasets: [{
+                            label: 'Tu Progreso',
+                            data: [0],
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    };
+                }
+                
+                const labels = courseResults.attempts.map((attempt, index) => `Intento ${index + 1}`);
+                const scores = courseResults.attempts.map(attempt => attempt.score);
+                
+                return {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tus Puntuaciones',
+                        data: scores,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Mínimo para Aprobar',
+                        data: new Array(scores.length).fill(70),
+                        borderColor: '#ef4444',
+                        borderDash: [5, 5],
+                        backgroundColor: 'transparent',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                };
+            }
+
+            handleSearch(query) {
+                const searchTerm = query.toLowerCase().trim();
+                
+                if (searchTerm === '') {
+                    this.renderCourses();
+                    return;
+                }
+
+                const filteredCourses = this.courses.filter(course => 
+                    course.title.toLowerCase().includes(searchTerm) ||
+                    course.description.toLowerCase().includes(searchTerm)
+                );
+
+                this.renderFilteredCourses(filteredCourses);
+            }
+
+            renderFilteredCourses(courses) {
+                const grid = document.getElementById('coursesGrid');
+                grid.innerHTML = '';
+
+                if (courses.length === 0) {
+                    this.showEmptyState('coursesGrid', 'No se encontraron cursos', 'Intenta con otros términos de búsqueda');
+                    return;
+                }
+
+                courses.forEach(course => {
+                    const card = this.createCourseCard(course);
+                    grid.appendChild(card);
+                });
+            }
+
+            showView(viewName) {
+                document.querySelectorAll('.view').forEach(view => {
+                    view.classList.remove('active');
+                });
+
+                document.getElementById(`${viewName}View`).classList.add('active');
+                this.currentView = viewName;
+
+                history.pushState({ view: viewName }, '', `#${viewName}`);
+            }
+
+            showZoomManagement() {
+                this.renderZoomManagement();
+                this.showView('zoomManagementView');
+            }
+
+            renderZoomManagement() {
+                const container = document.getElementById('zoomManagementContainer');
+                container.innerHTML = '';
+
+                if (this.courses.length === 0) {
+                    this.showEmptyState('zoomManagementContainer', 'No hay cursos disponibles', 'Contacta al administrador para más información');
+                    return;
+                }
+
+                this.courses.forEach(course => {
+                    const courseSection = document.createElement('div');
+                    courseSection.className = 'zoom-course-section';
+                    
+                    const courseZoomLinks = this.zoomLinks[course.id] || [];
+                    
+                    courseSection.innerHTML = `
+                        <div class="zoom-course-header">
+                            <h3><i class="${course.icon}" style="color: ${course.color}"></i> ${course.title}</h3>
+                            <button class="action-btn primary" onclick="app.addZoomLinkToCourse('${course.id}')">
+                                <i class="fas fa-plus"></i>
+                                Agregar Enlace
+                            </button>
+                        </div>
+                        <div class="zoom-links-container" id="zoomLinks-${course.id}">
+                            ${courseZoomLinks.length === 0 ? `
+                                <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                    <i class="fas fa-video-slash" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                                    <p>No hay enlaces de Zoom configurados para este curso</p>
+                                </div>
+                            ` : courseZoomLinks.map((link, index) => `
+                                <div class="zoom-link">
+                                    <i class="fab fa-zoom" style="color: #2D8CFF;"></i>
+                                    <div style="flex: 1;">
+                                        <strong>${link.title || 'Conferencia del Curso'}</strong>
+                                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                                            ${link.description || 'Únete a la conferencia programada'}
+                                        </div>
+                                    </div>
+                                    <div class="zoom-actions">
+                                        <a href="${link.url}" target="_blank" class="action-btn primary" rel="noopener noreferrer">
+                                            <i class="fas fa-external-link-alt"></i>
+                                            Unirse
+                                        </a>
+                                        <button class="action-btn secondary" onclick="app.editZoomLinkInManagement('${course.id}', ${index})" aria-label="Editar enlace">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="action-btn secondary" onclick="app.deleteZoomLinkInManagement('${course.id}', ${index})" aria-label="Eliminar enlace">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    container.appendChild(courseSection);
+                });
+            }
+
+            addZoomLinkToCourse(courseId) {
+                const title = prompt('Título de la conferencia:');
+                if (!title) return;
+
+                const description = prompt('Descripción (opcional):');
+                const url = prompt('URL de la conferencia Zoom:');
+                if (!url) return;
+
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    this.showToast('La URL debe comenzar con http:// o https://', 'error');
+                    return;
+                }
+
+                if (!this.zoomLinks[courseId]) {
+                    this.zoomLinks[courseId] = [];
+                }
+
+                this.zoomLinks[courseId].push({
+                    title,
+                    description,
+                    url
+                });
+
+                localStorage.setItem('zoomLinks', JSON.stringify(this.zoomLinks));
+                this.renderZoomManagement();
+                this.showToast('Enlace de Zoom agregado correctamente', 'success');
+            }
+
+            editZoomLinkInManagement(courseId, index) {
+                const link = this.zoomLinks[courseId][index];
+                const title = prompt('Nuevo título:', link.title);
+                if (title === null) return;
+
+                const description = prompt('Nueva descripción:', link.description || '');
+                const url = prompt('Nueva URL:', link.url);
+                if (url === null) return;
+
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    this.showToast('La URL debe comenzar con http:// o https://', 'error');
+                    return;
+                }
+
+                this.zoomLinks[courseId][index] = {
+                    title: title || link.title,
+                    description: description || link.description,
+                    url: url || link.url
+                };
+
+                localStorage.setItem('zoomLinks', JSON.stringify(this.zoomLinks));
+                this.renderZoomManagement();
+                this.showToast('Enlace de Zoom actualizado', 'success');
+            }
+
+            deleteZoomLinkInManagement(courseId, index) {
+                if (confirm('¿Estás seguro de que quieres eliminar este enlace de Zoom?')) {
+                    this.zoomLinks[courseId].splice(index, 1);
+                    localStorage.setItem('zoomLinks', JSON.stringify(this.zoomLinks));
+                    this.renderZoomManagement();
+                    this.showToast('Enlace de Zoom eliminado', 'success');
+                }
+            }
+
+            showTestManagement() {
+                this.renderTestManagement();
+                this.showView('testManagementView');
+            }
+
+            renderTestManagement() {
+                const grid = document.getElementById('testManagementGrid');
+                grid.innerHTML = '';
+
+                if (this.courses.length === 0) {
+                    this.showEmptyState('testManagementGrid', 'No hay cursos disponibles', 'Contacta al administrador para más información');
+                    return;
+                }
+
+                this.courses.forEach(course => {
+                    const card = document.createElement('div');
+                    card.className = 'material-card';
+                    
+                    const courseTest = this.tests[course.id] ? this.tests[course.id][0] : null;
+                    const hasTest = courseTest !== null;
+                    const questionCount = hasTest ? courseTest.questions.length : 0;
+                    
+                    card.innerHTML = `
+                        <div class="material-icon" style="background: ${course.color}20; color: ${course.color}">
+                            <i class="${course.icon}"></i>
+                        </div>
+                        <h4>${course.title}</h4>
+                        <p>${course.description}</p>
+                        <div class="material-meta">
+                            <span>${hasTest ? `${questionCount}/10 preguntas` : 'Sin test configurado'}</span>
+                            <span>${hasTest ? 'Configurado' : 'No configurado'}</span>
+                        </div>
+                        <div class="material-actions">
+                            <button class="action-btn primary" onclick="app.editCourseTest('${course.id}')">
+                                <i class="fas fa-edit"></i>
+                                ${hasTest ? 'Editar Test' : 'Crear Test'}
+                            </button>
+                            ${hasTest ? `
+                                <button class="action-btn secondary" onclick="app.deleteCourseTest('${course.id}')">
+                                    <i class="fas fa-trash"></i>
+                                    Eliminar
+                                </button>
+                            ` : ''}
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            editCourseTest(courseId) {
+                this.editingCourseId = courseId;
+                const course = this.courses.find(c => c.id === courseId);
+                const courseTest = this.tests[courseId] ? this.tests[courseId][0] : null;
+                
+                document.getElementById('testEditorTitle').textContent = `Editor de Test - ${course.title}`;
+                document.getElementById('testEditorSubtitle').textContent = 'Configura las preguntas y respuestas del test';
+                
+                document.getElementById('testTitle').value = courseTest ? courseTest.title : `Evaluación - ${course.title}`;
+                document.getElementById('testDescription').value = courseTest ? courseTest.description : `Completa este test para evaluar tu comprensión del curso ${course.title}`;
+                document.getElementById('testDuration').value = courseTest ? Math.floor(courseTest.duration / 60) : 30;
+                document.getElementById('passingScore').value = courseTest ? courseTest.passingScore : 70;
+                
+                const questionsContainer = document.getElementById('questionsContainer');
+                questionsContainer.innerHTML = '';
+                this.questionCounter = 0;
+                
+                if (courseTest && courseTest.questions.length > 0) {
+                    courseTest.questions.forEach(question => {
+                        this.addQuestion(question);
+                    });
+                } else {
+                    for (let i = 0; i < 10; i++) {
+                        this.addQuestion();
+                    }
+                }
+                
+                this.showView('testEditorView');
+            }
+
+            addQuestion(existingQuestion = null) {
+                if (this.questionCounter >= 10) {
+                    this.showToast('Máximo 10 preguntas permitidas por test', 'error');
+                    return;
+                }
+                
+                this.questionCounter++;
+                const questionsContainer = document.getElementById('questionsContainer');
+                
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                questionCard.innerHTML = `
+                    <div class="question-header">
+                        <h4>Pregunta ${this.questionCounter}</h4>
+                        <button class="action-btn secondary" onclick="this.parentElement.parentElement.remove(); app.questionCounter--;" aria-label="Eliminar pregunta">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label>Enunciado de la pregunta</label>
+                        <textarea placeholder="Escribe la pregunta aquí..." rows="2">${existingQuestion ? existingQuestion.question : ''}</textarea>
+                    </div>
+                    <div class="options-container">
+                        <div class="form-group">
+                            <label>Opciones de respuesta</label>
+                            ${['A', 'B', 'C', 'D'].map(letter => `
+                                <div class="option-row">
+                                    <input type="text" placeholder="Opción ${letter}" data-letter="${letter}" value="${existingQuestion ? (existingQuestion.options[letter.charCodeAt(0) - 65] || '') : ''}">
+                                    <div class="correct-option">
+                                        <input type="radio" name="correct-${this.questionCounter}" value="${letter}" ${(existingQuestion && existingQuestion.correctAnswer === (letter.charCodeAt(0) - 65)) ? 'checked' : (letter === 'A' ? 'checked' : '')}>
+                                        <span>Correcta</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                questionsContainer.appendChild(questionCard);
+            }
+
+            saveTest() {
+                const title = document.getElementById('testTitle').value.trim();
+                const description = document.getElementById('testDescription').value.trim();
+                const duration = parseInt(document.getElementById('testDuration').value);
+                const passingScore = parseInt(document.getElementById('passingScore').value);
+                
+                if (!title) {
+                    this.showError('testTitleError', 'El título del test es obligatorio');
+                    document.getElementById('testTitle').classList.add('input-error');
+                    return;
+                } else {
+                    this.hideError('testTitleError');
+                    document.getElementById('testTitle').classList.remove('input-error');
+                }
+                
+                if (isNaN(duration) || duration < 5 || duration > 180) {
+                    this.showToast('La duración debe estar entre 5 y 180 minutos', 'error');
+                    return;
+                }
+                
+                if (isNaN(passingScore) || passingScore < 50 || passingScore > 100) {
+                    this.showToast('La puntuación para aprobar debe estar entre 50% y 100%', 'error');
+                    return;
+                }
+                
+                const questions = [];
+                const questionCards = document.querySelectorAll('.question-card');
+                
+                if (questionCards.length === 0) {
+                    this.showToast('Agrega al menos una pregunta al test', 'error');
+                    return;
+                }
+                
+                let hasErrors = false;
+                
+                questionCards.forEach((card, index) => {
+                    const questionText = card.querySelector('textarea').value.trim();
+                    const optionInputs = card.querySelectorAll('input[type="text"]');
+                    const correctRadio = card.querySelector('input[type="radio"]:checked');
+                    
+                    if (!questionText) {
+                        this.showToast(`La pregunta ${index + 1} está incompleta`, 'error');
+                        hasErrors = true;
+                        return;
+                    }
+                    
+                    const options = [];
+                    optionInputs.forEach(input => {
+                        if (input.value.trim()) {
+                            options.push(input.value.trim());
+                        }
+                    });
+                    
+                    if (options.length < 2) {
+                        this.showToast(`La pregunta ${index + 1} debe tener al menos 2 opciones`, 'error');
+                        hasErrors = true;
+                        return;
+                    }
+                    
+                    questions.push({
+                        id: index + 1,
+                        question: questionText,
+                        options: options,
+                        correctAnswer: correctRadio ? parseInt(correctRadio.value.charCodeAt(0) - 65) : 0
+                    });
+                });
+                
+                if (hasErrors) return;
+                
+                const test = {
+                    id: 'test-' + Date.now(),
+                    title: title,
+                    description: description,
+                    courseId: this.editingCourseId,
+                    duration: duration * 60,
+                    passingScore: passingScore,
+                    questions: questions,
+                    createdAt: new Date().toISOString()
+                };
+                
+                if (!this.tests[this.editingCourseId]) {
+                    this.tests[this.editingCourseId] = [];
+                }
+                this.tests[this.editingCourseId] = [test];
+                localStorage.setItem('courseTests', JSON.stringify(this.tests));
+                
+                this.showToast('Test guardado exitosamente', 'success');
+                this.showView('testManagementView');
+                this.renderTestManagement();
+            }
+
+            deleteCourseTest(courseId) {
+                if (confirm('¿Estás seguro de que quieres eliminar el test de este curso?')) {
+                    delete this.tests[courseId];
+                    localStorage.setItem('courseTests', JSON.stringify(this.tests));
+                    this.renderTestManagement();
+                    this.showToast('Test eliminado', 'success');
+                }
+            }
+
+            loadExistingTests() {
+                const savedTests = localStorage.getItem('courseTests');
+                if (savedTests) {
+                    try {
+                        this.tests = JSON.parse(savedTests);
+                    } catch (error) {
+                        console.error('Error al cargar tests:', error);
+                        this.tests = {};
+                    }
+                }
+            }
+
+            showUserManagement() {
+                this.showToast('Funcionalidad de gestión de usuarios en desarrollo', 'info');
+            }
+
+            showAnalytics() {
+                this.showToast('Funcionalidad de analíticas en desarrollo', 'info');
+            }
+
+            setTheme(theme) {
+                this.theme = theme;
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+
+                const icon = document.querySelector('#themeToggle i');
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+                icon.setAttribute('aria-label', theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+            }
+
+            toggleTheme() {
+                const newTheme = this.theme === 'light' ? 'dark' : 'light';
+                this.setTheme(newTheme);
+            }
+
+            showLoadingScreen(show = true) {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    if (show) {
+                        loadingScreen.classList.remove('hidden');
+                    } else {
+                        loadingScreen.classList.add('hidden');
+                    }
+                }
+            }
+
+            showToast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+                
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'polite');
+                
+                const icons = {
+                    success: 'fas fa-check-circle',
+                    error: 'fas fa-exclamation-circle',
+                    info: 'fas fa-info-circle',
+                    warning: 'fas fa-exclamation-triangle'
+                };
+
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="${icons[type]}"></i>
+                    </div>
+                    <div class="toast-message">${message}</div>
+                `;
+
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 5000);
+            }
+
+            showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.style.display = 'flex';
+                    errorElement.querySelector('span').textContent = message;
+                }
+            }
+
+            hideError(elementId) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.style.display = 'none';
+                }
+            }
+
+            showEmptyState(containerId, title, description) {
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>${title}</h3>
+                            <p>${description}</p>
+                        </div>
+                    `;
+                }
+            }
+
+            toggleChatbot() {
+                const chatbot = document.getElementById('chatbotContainer');
+                chatbot.classList.toggle('active');
+                
+                if (chatbot.classList.contains('active')) {
+                    window.chatbotManager.startChat();
+                }
+            }
+
+            hideChatbot() {
+                document.getElementById('chatbotContainer').classList.remove('active');
+            }
+        }
+
+        // TestManager mejorado
+        class TestManager {
+            constructor() {
+                this.currentTest = null;
+                this.currentQuestionIndex = 0;
+                this.userAnswers = [];
+                this.timer = null;
+                this.timeRemaining = 0;
+                this.userName = '';
+                this.testStartTime = null;
+            }
+
+            async initializeTest(courseId) {
+                this.courseId = courseId;
+                
+                const savedTests = JSON.parse(localStorage.getItem('courseTests')) || {};
+                const courseTests = savedTests[courseId] || [];
+                
+                if (courseTests.length > 0) {
+                    this.currentTest = courseTests[0];
+                } else {
+                    await this.loadDefaultTestData(courseId);
+                }
+                
+                this.renderTestWelcome();
+            }
+
+            async loadDefaultTestData(courseId) {
+                this.currentTest = {
+                    id: `test-${courseId}`,
+                    title: 'Evaluación Final - Inspector de Calidad',
+                    description: 'Completa este test de 15 preguntas para evaluar tu comprensión de los fundamentos de calidad, rol del inspector, técnicas de inspección y mejora continua.',
+                    duration: 1800,
+                    passingScore: 70,
+                    questions: [
+                        {
+                            id: 1,
+                            question: "¿Qué significa realmente el concepto de calidad en una empresa?",
+                            options: [
+                                "Revisar los productos al final del proceso",
+                                "Cumplir con lo que el cliente, la norma o la empresa exige",
+                                "Trabajar rápido para producir más",
+                                "Hacer productos bonitos"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            id: 2,
+                            question: "Según la norma ISO 9001:2015, la calidad se mide por:",
+                            options: [
+                                "La cantidad de productos fabricados",
+                                "El grado en que las características cumplen con los requisitos",
+                                "El precio de venta del producto",
+                                "La experiencia del operario"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            id: 3,
+                            question: "¿Por qué la calidad genera confianza?",
+                            options: [
+                                "Porque reduce los costos de empaque",
+                                "Porque se fabrican más unidades",
+                                "Porque garantiza que el producto sea siempre igual y cumpla lo prometido",
+                                "Porque evita tener que revisar los lotes"
+                            ],
+                            correctAnswer: 2
+                        },
+                        {
+                            id: 4,
+                            question: "¿Cuál de las siguientes afirmaciones describe mejor el control de calidad?",
+                            options: [
+                                "Asegura la mejora continua",
+                                "Define políticas y objetivos",
+                                "Revisa los productos para confirmar si cumplen o no",
+                                "Gestiona la compra de materiales"
+                            ],
+                            correctAnswer: 2
+                        },
+                        {
+                            id: 5,
+                            question: "¿Cuál de estas tareas pertenece más al aseguramiento de la calidad que al control?",
+                            options: [
+                                "Inspeccionar el producto en proceso de mezclado",
+                                "Crear procedimientos y estandarizar procesos para evitar errores futuros",
+                                "Revisar un lote rechazado",
+                                "Tomar muestras en producción"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            id: 6,
+                            question: "El rol del inspector de calidad dentro del proceso es:",
+                            options: [
+                                "Arreglar equipos averiados",
+                                "Elaborar informes financieros",
+                                "Dirigir las reuniones de producción",
+                                "Garantizar que el producto cumpla las especificaciones antes de ser liberado"
+                            ],
+                            correctAnswer: 3
+                        },
+                        {
+                            id: 7,
+                            question: "Un buen inspector de calidad debe tener:",
+                            options: [
+                                "Paciencia, objetividad y atención al detalle",
+                                "Velocidad para trabajar más rápido",
+                                "Autoridad para sancionar al personal",
+                                "Experiencia en mantenimiento mecánico"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            id: 8,
+                            question: "¿Cuál de estas acciones muestra un trabajo correcto del inspector?",
+                            options: [
+                                "Ignorar defectos menores para no detener la línea",
+                                "Registrar cada hallazgo, aunque sea pequeño",
+                                "Tomar decisiones sin consultar el procedimiento",
+                                "Cambiar la muestra si no le parece correcta"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            id: 9,
+                            question: "¿Cuál es el propósito principal de una inspección visual?",
+                            options: [
+                                "Revisar documentos del lote",
+                                "Detectar defectos visibles en el producto",
+                                "Verificar los datos del sistema",
+                                "Revisar las etiquetas de envío"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            id: 10,
+                            question: "Un defecto mayor es aquel que:",
+                            options: [
+                                "Solo afecta a los materiales internos",
+                                "Pone en riesgo la seguridad del usuario",
+                                "No tiene importancia",
+                                "No afecta la función, pero sí la apariencia del producto"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            id: 11,
+                            question: "En un plan de muestreo, el AQL (Nivel de Calidad Aceptable) indica:",
+                            options: [
+                                "El número total de productos en el lote",
+                                "El porcentaje máximo de defectos que se considera aceptable",
+                                "La cantidad de inspecciones requeridas",
+                                "El tamaño de la muestra a revisar"
+                            ],
+                            correctAnswer: 1
+                        },
+                        {
+                            id: 12,
+                            question: "La trazabilidad en calidad permite:",
+                            options: [
+                                "Identificar los empleados de cada turno",
+                                "Marcar solo los productos defectuosos",
+                                "Seguir el historial de un producto desde su origen hasta su destino",
+                                "Llevar control del inventario de materiales"
+                            ],
+                            correctAnswer: 2
+                        },
+                        {
+                            id: 13,
+                            question: "El método de los 5 Porqués sirve para:",
+                            options: [
+                                "Registrar datos de empaque",
+                                "Contar cuántas veces ocurre un defecto",
+                                "Medir el tiempo de producción",
+                                "Buscar la causa raíz de un problema"
+                            ],
+                            correctAnswer: 3
+                        },
+                        {
+                            id: 14,
+                            question: "¿Para qué se utiliza el Diagrama de Pareto?",
+                            options: [
+                                "Para identificar qué problemas son más frecuentes o impactan más",
+                                "Para trazar el flujo de producción",
+                                "Para calcular el AQL",
+                                "Para clasificar los tipos de producto"
+                            ],
+                            correctAnswer: 0
+                        },
+                        {
+                            id: 15,
+                            question: "Tener una cultura de calidad en la empresa significa:",
+                            options: [
+                                "Que los errores se oculten para no generar reportes",
+                                "Que solo el departamento de calidad se encargue",
+                                "Que cada persona asuma responsabilidad por hacer las cosas bien desde la primera vez",
+                                "Que la producción trabaje más rápido"
+                            ],
+                            correctAnswer: 2
+                        }
+                    ]
+                };
+            }
+
+            renderTestWelcome() {
+                const container = document.getElementById('testContainer');
+                container.innerHTML = `
+                    <div class="test-welcome">
+                        <h2>Test de Evaluación</h2>
+                        <p>${this.currentTest.description}</p>
+                        
+                        <div class="test-info">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                                <div class="stat-card">
+                                    <div class="stat-value">${this.currentTest.questions.length}</div>
+                                    <div class="stat-label">Preguntas</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">${Math.floor(this.currentTest.duration / 60)} min</div>
+                                    <div class="stat-label">Duración</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value">${this.currentTest.passingScore}%</div>
+                                    <div class="stat-label">Para aprobar</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="name-input">
+                            <input type="text" id="userNameInput" placeholder="Ingresa tu nombre completo" maxlength="50">
+                        </div>
+
+                        <button class="start-test-btn" onclick="testManager.startTest()">
+                            <i class="fas fa-play-circle"></i>
+                            Iniciar Test
+                        </button>
+
+                        <div style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.9rem;">
+                            <p><i class="fas fa-info-circle"></i> Puedes saltar preguntas y volver después</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            startTest() {
+                const userNameInput = document.getElementById('userNameInput');
+                const userName = userNameInput.value.trim();
+
+                if (!userName) {
+                    app.showToast('Por favor ingresa tu nombre', 'error');
+                    userNameInput.focus();
+                    return;
+                }
+
+                this.userName = userName;
+                this.currentQuestionIndex = 0;
+                this.userAnswers = new Array(this.currentTest.questions.length).fill(null);
+                this.timeRemaining = this.currentTest.duration;
+                this.testStartTime = new Date();
+
+                this.startTimer();
+                this.renderCurrentQuestion();
+            }
+
+            startTimer() {
+                this.updateTimerDisplay();
+
+                this.timer = setInterval(() => {
+                    this.timeRemaining--;
+                    this.updateTimerDisplay();
+
+                    if (this.timeRemaining <= 0) {
+                        this.finishTest();
+                    }
+                }, 1000);
+            }
+
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.timeRemaining / 60);
+                const seconds = this.timeRemaining % 60;
+                const timerElement = document.querySelector('.timer');
+                
+                if (timerElement) {
+                    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    if (this.timeRemaining < 300) {
+                        timerElement.style.color = '#ef4444';
+                    }
+                }
+            }
+
+            renderCurrentQuestion() {
+                if (!this.currentTest || !this.currentTest.questions[this.currentQuestionIndex]) {
+                    return;
+                }
+
+                const question = this.currentTest.questions[this.currentQuestionIndex];
+                const container = document.getElementById('testContainer');
+
+                container.innerHTML = `
+                    <div class="test-question">
+                        <div class="question-header">
+                            <div class="question-number">
+                                Pregunta ${this.currentQuestionIndex + 1} de ${this.currentTest.questions.length}
+                            </div>
+                            <div class="timer">${Math.floor(this.timeRemaining / 60).toString().padStart(2, '0')}:${(this.timeRemaining % 60).toString().padStart(2, '0')}</div>
+                        </div>
+
+                        <div class="question-text">
+                            ${question.question}
+                        </div>
+
+                        <div class="options-grid">
+                            ${question.options.map((option, index) => `
+                                <div class="option ${this.userAnswers[this.currentQuestionIndex] === index ? 'selected' : ''}" 
+                                     onclick="testManager.selectAnswer(${index})"
+                                     role="radio"
+                                     aria-checked="${this.userAnswers[this.currentQuestionIndex] === index}"
+                                     tabindex="0">
+                                    <div class="option-marker">${String.fromCharCode(65 + index)}</div>
+                                    <div class="option-text">${option}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="test-navigation">
+                            <button class="nav-btn" onclick="testManager.previousQuestion()" 
+                                    ${this.currentQuestionIndex === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-left"></i>
+                                Anterior
+                            </button>
+
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${((this.currentQuestionIndex + 1) / this.currentTest.questions.length) * 100}%"></div>
+                                </div>
+                                <div class="progress-text">${this.currentQuestionIndex + 1}/${this.currentTest.questions.length}</div>
+                            </div>
+
+                            <button class="nav-btn" onclick="testManager.nextQuestion()">
+                                ${this.currentQuestionIndex === this.currentTest.questions.length - 1 ? 
+                                    'Finalizar Test' : 'Siguiente'}
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                this.setupKeyboardNavigation();
+            }
+
+            setupKeyboardNavigation() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        this.previousQuestion();
+                    } else if (e.key === 'ArrowRight') {
+                        this.nextQuestion();
+                    } else if (e.key >= '1' && e.key <= '4') {
+                        const optionIndex = parseInt(e.key) - 1;
+                        this.selectAnswer(optionIndex);
+                    } else if (e.key >= 'a' && e.key <= 'd') {
+                        const optionIndex = e.key.charCodeAt(0) - 'a'.charCodeAt(0);
+                        this.selectAnswer(optionIndex);
+                    }
+                });
+            }
+
+            selectAnswer(answerIndex) {
+                this.userAnswers[this.currentQuestionIndex] = answerIndex;
+                this.renderCurrentQuestion();
+            }
+
+            previousQuestion() {
+                if (this.currentQuestionIndex > 0) {
+                    this.currentQuestionIndex--;
+                    this.renderCurrentQuestion();
+                }
+            }
+
+            nextQuestion() {
+                if (this.currentQuestionIndex < this.currentTest.questions.length - 1) {
+                    this.currentQuestionIndex++;
+                    this.renderCurrentQuestion();
+                } else {
+                    this.finishTest();
+                }
+            }
+
+            finishTest() {
+                clearInterval(this.timer);
+                this.calculateResults();
+            }
+
+            calculateResults() {
+                const totalQuestions = this.currentTest.questions.length;
+                const correctAnswers = this.userAnswers.reduce((count, answer, index) => {
+                    return count + (answer === this.currentTest.questions[index].correctAnswer ? 1 : 0);
+                }, 0);
+
+                const score = (correctAnswers / totalQuestions) * 100;
+                const passed = score >= this.currentTest.passingScore;
+
+                this.showResults(score, correctAnswers, totalQuestions, passed);
+            }
+
+            showResults(score, correctAnswers, totalQuestions, passed) {
+                const container = document.getElementById('testContainer');
+                const roundedScore = Math.round(score);
+                
+                this.saveTestResult(roundedScore, correctAnswers, totalQuestions);
+                
+                container.innerHTML = `
+                    <div class="test-results">
+                        <div class="result-score">${roundedScore}%</div>
+                        <div class="result-message">
+                            ${passed ? '🎉 ¡Felicidades! Has aprobado el test' : '😔 No has alcanzado la puntuación mínima'}
+                        </div>
+                        
+                        <div class="result-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">${correctAnswers}/${totalQuestions}</div>
+                                <div class="stat-label">Respuestas Correctas</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${roundedScore}%</div>
+                                <div class="stat-label">Puntuación Final</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${passed ? 'Aprobado' : 'Reprobado'}</div>
+                                <div class="stat-label">Estado</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1rem;">Resumen para ${this.userName}</h3>
+                            <p style="color: var(--text-secondary);">
+                                ${passed ? 
+                                    'Has demostrado un buen entendimiento de los conceptos del curso.' :
+                                    'Te recomendamos repasar los materiales del curso y intentar nuevamente.'
+                                }
+                            </p>
+                        </div>
+
+                        <div class="result-actions">
+                            <button class="action-btn primary" onclick="testManager.restartTest()">
+                                <i class="fas fa-redo"></i>
+                                Intentar Nuevamente
+                            </button>
+                            <button class="action-btn secondary" onclick="app.showView('dashboard')">
+                                <i class="fas fa-home"></i>
+                                Volver al Inicio
+                            </button>
+                            <button class="action-btn secondary" onclick="app.showView('courseDetail')">
+                                <i class="fas fa-chart-line"></i>
+                                Ver Progreso
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            saveTestResult(score, correctAnswers, totalQuestions) {
+                if (!window.app || !this.courseId) return;
+                
+                const courseId = this.courseId;
+                const currentDate = new Date().toISOString();
+                const testDuration = this.testStartTime ? 
+                    Math.floor((new Date() - this.testStartTime) / 1000) : 0;
+                
+                if (!window.app.userResults[courseId]) {
+                    window.app.userResults[courseId] = {
+                        attempts: [],
+                        bestScore: 0,
+                        lastScore: 0
+                    };
+                }
+                
+                window.app.userResults[courseId].attempts.push({
+                    score: score,
+                    correctAnswers: correctAnswers,
+                    totalQuestions: totalQuestions,
+                    date: currentDate,
+                    userName: this.userName,
+                    duration: testDuration
+                });
+                
+                if (score > window.app.userResults[courseId].bestScore) {
+                    window.app.userResults[courseId].bestScore = score;
+                }
+                
+                window.app.userResults[courseId].lastScore = score;
+                
+                localStorage.setItem('userResults', JSON.stringify(window.app.userResults));
+                
+                if (window.app.currentView === 'courseDetail') {
+                    window.app.initializeProgressTab();
+                }
+            }
+
+            restartTest() {
+                this.currentQuestionIndex = 0;
+                this.userAnswers = new Array(this.currentTest.questions.length).fill(null);
+                this.timeRemaining = this.currentTest.duration;
+                this.testStartTime = new Date();
+                
+                this.startTimer();
+                this.renderCurrentQuestion();
+            }
+        }
+
+        // Gestor del Chatbot EVA
+        class ChatbotManager {
+            constructor() {
+                this.conversationState = 'initial';
+                this.conversationHistory = [];
+            }
+
+            startChat() {
+                this.clearChat();
+                this.addBotMessage("👋 ¡Hola! Soy EVA, la asistente virtual de Next Talent Academy.\n\nEstoy aquí para ayudarte con todo lo relacionado a tu curso.\n\n✨ Para comenzar, dime ¿A cuál curso perteneces o cuál te interesa?");
+                
+                this.showOptions([
+                    "Inspector de Calidad",
+                    "Seguridad Industrial", 
+                    "Planificacion de la produccion",
+                    "Mantenimiento Autónomo",
+                    "Marketing Digital",
+                    "Programación Web",
+                    "❓ Otro / Aún no estoy inscrito"
+                ]);
+            }
+
+            addBotMessage(message) {
+                const messagesContainer = document.getElementById('chatbotMessages');
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message bot';
+                messageElement.textContent = message;
+                messagesContainer.appendChild(messageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                this.conversationHistory.push({ type: 'bot', message: message });
+            }
+
+            addUserMessage(message) {
+                const messagesContainer = document.getElementById('chatbotMessages');
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message user';
+                messageElement.textContent = message;
+                messagesContainer.appendChild(messageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                this.conversationHistory.push({ type: 'user', message: message });
+            }
+
+            showOptions(options) {
+                const optionsContainer = document.getElementById('chatbotOptions');
+                optionsContainer.innerHTML = '';
+                
+                options.forEach(option => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'chatbot-option';
+                    optionElement.textContent = option;
+                    optionElement.setAttribute('role', 'button');
+                    optionElement.setAttribute('tabindex', '0');
+                    optionElement.addEventListener('click', () => {
+                        this.handleOptionSelection(option);
+                    });
+                    optionElement.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.handleOptionSelection(option);
+                        }
+                    });
+                    optionsContainer.appendChild(optionElement);
+                });
+            }
+
+            handleOptionSelection(option) {
+                this.addUserMessage(option);
+                
+                switch(this.conversationState) {
+                    case 'initial':
+                        this.handleCourseSelection(option);
+                        break;
+                    case 'notEnrolled':
+                        this.handleNotEnrolledSelection(option);
+                        break;
+                    case 'courseSelected':
+                        this.handleCourseQuestions(option);
+                        break;
+                }
+            }
+
+            handleCourseSelection(option) {
+                if (option === "❓ Otro / Aún no estoy inscrito") {
+                    this.conversationState = 'notEnrolled';
+                    this.addBotMessage("¡Perfecto! ¿Te gustaría que te recomiende un curso según tu perfil?");
+                    this.showOptions([
+                        "👩‍🔬 Me interesa trabajar en Calidad / Producción",
+                        "🧪 Quiero aprender sobre cosméticos y detergentes", 
+                        "📊 Necesito herramientas como Excel o auditoría",
+                        "🧑‍🏫 Quiero ver el catálogo de todos los cursos"
+                    ]);
+                } else {
+                    this.conversationState = 'courseSelected';
+                    this.selectedCourse = option;
+                    this.addBotMessage(`Excelente elección. El curso de ${option} es uno de nuestros más populares. ¿En qué puedo ayudarte?`);
+                    this.showOptions([
+                        "¿Cómo obtengo mi certificado?",
+                        "Hablar con el tutor humanamente",
+                        "Volver al menú principal"
+                    ]);
+                }
+            }
+
+            handleNotEnrolledSelection(option) {
+                if (option === "🧑‍🏫 Quiero ver el catálogo de todos los cursos") {
+                    window.open('https://educacionnext.github.io/NextTalentAcademy/', '_blank', 'noopener,noreferrer');
+                    this.addBotMessage("Te he redirigido a nuestra página oficial donde podrás ver todos los cursos disponibles. ¿Hay algo más en lo que pueda ayudarte?");
+                } else {
+                    let recommendedCourse = "";
+                    
+                    if (option.includes("Calidad / Producción")) {
+                        recommendedCourse = "Inspector de Calidad";
+                    } else if (option.includes("cosméticos")) {
+                        recommendedCourse = "Seguridad Industrial";
+                    } else if (option.includes("Excel")) {
+                        recommendedCourse = "Mantenimiento Autónomo";
+                    }
+                    
+                    this.addBotMessage(`Basado en tu perfil, te recomiendo el curso de ${recommendedCourse}. Este curso se adapta perfectamente a tus intereses y objetivos profesionales.`);
+                    
+                    setTimeout(() => {
+                        this.addBotMessage("¿Te gustaría conocer más detalles sobre este curso o prefieres explorar otras opciones?");
+                        this.showOptions([
+                            `Ver detalles de ${recommendedCourse}`,
+                            "Explorar otros cursos",
+                            "Contactar con un asesor"
+                        ]);
+                    }, 1500);
+                }
+                
+                this.showClosingMessage();
+            }
+
+            handleCourseQuestions(option) {
+                if (option === "¿Cómo obtengo mi certificado?") {
+                    this.addBotMessage("Para recibir tu certificado debes:\n\n✅ Completar todas las clases\n✅ Aprobar las evaluaciones / proyecto final\n\nUna vez cumplas estos requisitos, tu certificado será generado automáticamente y estará disponible para descarga.");
+                } else if (option === "Hablar con el tutor humanamente") {
+                    this.addBotMessage("✅ Con gusto. Puedes comunicarte directamente con el tutor del curso por WhatsApp:\n\n📲 809-924-308\n\nO haz clic aquí para contactar: https://wa.me/1809924308");
+                } else if (option === "Volver al menú principal") {
+                    this.conversationState = 'initial';
+                    this.startChat();
+                    return;
+                }
+                
+                this.showClosingMessage();
+            }
+
+            showClosingMessage() {
+                setTimeout(() => {
+                    this.addBotMessage("¿Hay algo más en lo que pueda ayudarte?\n\n✅ Si necesitas hablar con un humano, puedes escribir al WhatsApp oficial: 809-924-308\n\n¡Gracias por elegir Next Talent Academy! 🚀✨");
+                    
+                    this.showOptions([
+                        "Sí, tengo otra pregunta",
+                        "No, gracias"
+                    ]);
+                }, 1000);
+            }
+
+            clearChat() {
+                const messagesContainer = document.getElementById('chatbotMessages');
+                const optionsContainer = document.getElementById('chatbotOptions');
+                
+                if (messagesContainer) messagesContainer.innerHTML = '';
+                if (optionsContainer) optionsContainer.innerHTML = '';
+                
+                this.conversationState = 'initial';
+                this.conversationHistory = [];
+            }
+        }
+
+        // Inicializar la aplicación cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM completamente cargado");
+            
+            // Crear instancia de la aplicación
+            window.app = new LearningApp();
+            
+            // Inicializar otros managers
+            window.testManager = new TestManager();
+            window.chatbotManager = new ChatbotManager();
+            
+            console.log("Aplicación inicializada correctamente");
+            
+            // Manejar navegación con el botón de retroceso
+            window.addEventListener('popstate', function(event) {
+                if (event.state && event.state.view) {
+                    window.app.showView(event.state.view);
+                }
+            });
+        });
+
+        // Manejar errores de recursos (imágenes, etc.)
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'IMG') {
+                console.warn('Error al cargar imagen:', e.target.src);
+            }
+        }, true);
+    </script>
+</body>
+</html>
