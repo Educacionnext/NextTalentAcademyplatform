@@ -2291,7 +2291,7 @@
                     'curso-2': 'NTA2024SI',
                     'curso-3': 'NTA2024PP',
                     'curso-4': 'NTA2024MA',
-                    'curso-5': 'NTA2024MD',
+                    'curso-5': 'NTA2024SC',
                     'curso-6': 'NTA2024PW'
                 };
                 this.unlockedCourses = JSON.parse(localStorage.getItem('unlockedCourses')) || [];
@@ -2578,7 +2578,7 @@
                                 stats: {
                                     files: 4,
                                     duration: '2h',
-                                    progress: 0
+                                    progress: 100
                                 }
                             },
                             {
@@ -2665,24 +2665,48 @@
                             },
                             {
                                 id: 'curso-5',
-                                title: 'Marketing Digital',
-                                description: 'Estrategias modernas de marketing digital para impulsar tu negocio.',
-                                icon: 'fas fa-bullhorn',
-                                color: '#ec4899',
+                                title: 'Supervisor de calidad',
+                                description: 'Desarrolla las habilidades necesarias para detectar desviaciones, liderar mejoras y asegurar productos confiables.',
+                                icon: 'fas fa-clipboard-check',
+                                color: '#6366f1',
                                 materials: [
                                     {
-                                        id: 'mat-10',
-                                        name: 'Guía de Redes Sociales',
+                                        id: 'mat-1',
+                                        name: 'Materiales',
                                         type: 'pdf',
-                                        size: '2.8 MB',
-                                        duration: '35 min',
-                                        path: 'https://drive.google.com/drive/folders/1Pl8M1-LW5nmQm8vDvxdzXFK3eqy7Us19?usp=sharing'
+                                        size: '2.4 MB',
+                                        duration: '45 min',
+                                        path: 'https://drive.google.com/drive/folders/1IqoVv0mTPrgpsKoWswl9vyG8wRz4xXDP?usp=sharing'
+                                    },
+                                    {
+                                        id: 'mat-2',
+                                        name: 'Presentación',
+                                        type: 'presentation',
+                                        size: '1.8 MB',
+                                        duration: '30 min',
+                                        path: 'https://drive.google.com/drive/folders/1IqoVv0mTPrgpsKoWswl9vyG8wRz4xXDP?usp=sharing'
+                                    },
+                                    {
+                                        id: 'mat-3',
+                                        name: 'Material audio visual',
+                                        type: 'video',
+                                        size: '15.2 MB',
+                                        duration: '12 min',
+                                        path: 'https://drive.google.com/drive/folders/1IqoVv0mTPrgpsKoWswl9vyG8wRz4xXDP?usp=sharing'
+                                    },
+                                    {
+                                        id: 'mat-4',
+                                        name: 'Test',
+                                        type: 'pdf',
+                                        size: '0.8 MB',
+                                        duration: '20 min',
+                                        path: 'https://docs.google.com/forms/d/e/1FAIpQLSdt8j3qU_1YfaVg04lJC-yGpM4G3JTcNCas_gEAZz1QOwqsBw/viewform?usp=header'
                                     }
                                 ],
                                 stats: {
-                                    files: 1,
-                                    duration: '35min',
-                                    progress: 5
+                                    files: 4,
+                                    duration: '2h',
+                                    progress: 2
                                 }
                             },
                             {
@@ -4245,7 +4269,7 @@
                     "Seguridad Industrial", 
                     "Planificacion de la produccion",
                     "Mantenimiento Autónomo",
-                    "Marketing Digital",
+                    "Supervisor de calidad",
                     "Programación Web",
                     "❓ Otro / Aún no estoy inscrito"
                 ]);
